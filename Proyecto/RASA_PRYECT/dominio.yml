@@ -1,0 +1,99 @@
+# Dominio en Rasa para la Empresa de Chatbots
+version: "3.6.13"
+intents:
+  - saludo
+  - solicitud_información
+  - describe_services
+  - programar_reunión
+  - propose_options
+  - provide_availability
+  - despedida
+#corregir
+entities:
+  - empresa
+  - servicios
+  - preferencia_reunion
+  - disponibilidad
+  - horario
+
+slots:
+  empresa:
+    type: text
+  servicios:
+    type: text
+  preferencia_reunion:
+    type: text
+  disponibilidad:
+    type: text
+  horario:
+    type: text
+
+actions:
+  - utter_intro_chatbot
+  - utter_servicios_empresa
+  - utter_programar_reunion
+  - utter_opciones_reunion
+  - utter_disponibilidad_horaria
+  - utter_confirmacion_horario
+  - action_schedule_meeting
+
+templates:
+  utter_intro_chatbot:
+    - text: "¡Bienvenido a nuestra empresa de desarrollo de chatbots! ¿En qué puedo ayudarte?"
+
+  utter_servicios_empresa:
+    - text: "Nuestros servicios incluyen el diseño y desarrollo de chatbots personalizados. ¿En qué más te gustaría saber?"
+
+  utter_programar_reunion:
+    - text: "Genial. Vamos a programar una reunión para discutir los detalles. ¿Cuál es tu preferencia para la reunión? ¿Por Meet, en nuestras oficinas o en un punto intermedio?"
+
+  utter_opciones_reunion:
+    - text: "Tenemos varias opciones para la reunión: por Meet, en nuestras oficinas o en un lugar intermedio. ¿Cuál prefieres?"
+
+  utter_disponibilidad_horaria:
+    - text: "Estamos disponibles para una reunión el jueves de 8 am a 5 pm. ¿A qué hora te gustaría programar la reunión?"
+
+  utter_confirmacion_horario:
+    - text: "Excelente, hemos agendado una reunión. ¡Esperamos verte entonces!"
+
+stories:
+  - story: Conversación sobre la empresa
+    steps:
+    - intent: inform
+      entities:
+      - empresa: empresa de chatbots
+      - servicios: desarrollo de chatbots
+    - action: utter_intro_chatbot
+
+  - story: Descripción de servicios
+    steps:
+    - intent: describe_services
+    - action: utter_servicios_empresa
+
+  - story: Programación de reunión
+    steps:
+    - intent: schedule_meeting
+    - action: utter_programar_reunion
+    - intent: provide_availability
+      entities:
+      - preferencia_reunion: meet
+
+  - story: Opciones de reunión
+    steps:
+    - intent: propose_options
+    - action: utter_opciones_reunion
+
+  - story: Confirmación de horario
+    steps:
+    - intent: provide_availability
+      entities:
+      - disponibilidad: jueves
+    - action: utter_disponibilidad_horaria
+    - intent: provide_availability
+      entities:
+      - horario: 4 pm
+    - action: utter_confirmacion_horario
+    - action: action_schedule_meeting
+
+forms:
+  - schedule_form
